@@ -22,10 +22,18 @@ return Application::configure(basePath: dirname(__DIR__))
                 'webhooks/ttxt',
             ]
         );
-        $middleware->web(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
-        ]);
+        $middleware->web(
+            prepend: [
+                \App\Http\Middleware\IpWhitelistMiddleware::class,
+                \App\Http\Middleware\BasicAuth::class,
+            ],
+            append: [
+                \App\Http\Middleware\SecurityHeaders::class,
+            ]
+        );
         $middleware->alias([
+            'ip.whitelist' => \App\Http\Middleware\IpWhitelistMiddleware::class,
+            'basic.auth' => \App\Http\Middleware\BasicAuth::class,
             'active.user' => \App\Http\Middleware\EnsureActiveUser::class,
             'platform.owner' => \App\Http\Middleware\EnsurePlatformOwner::class,
             'tenant.organizer' => \App\Http\Middleware\EnsureTenantOrganizer::class,

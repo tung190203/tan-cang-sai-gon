@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Backend\Core\DashboardController;
+use App\Http\Controllers\Backend\Core\IpWhitelistController;
 use App\Http\Controllers\Backend\Core\ModuleController;
 use App\Http\Controllers\Backend\Core\TenantController;
 use App\Http\Controllers\Backend\FileManagerController;
@@ -37,6 +38,13 @@ Route::localized(function () {
                 Route::get('/{module}/edit', [ModuleController::class, 'edit'])->name('backend_core_modules_edit');
                 Route::put('/{module}', [ModuleController::class, 'update'])->name('backend_core_modules_update');
                 Route::post('/{module}/toggle', [ModuleController::class, 'toggle'])->name('backend_core_modules_toggle');
+            });
+
+            Route::prefix('ip-whitelist')->group(function () {
+                Route::get('/', [IpWhitelistController::class, 'index'])->name('backend_core_ip_whitelist');
+                Route::post('/', [IpWhitelistController::class, 'store'])->name('backend_core_ip_whitelist_store');
+                Route::post('/{ipWhitelist}/toggle', [IpWhitelistController::class, 'toggle'])->name('backend_core_ip_whitelist_toggle');
+                Route::delete('/{ipWhitelist}', [IpWhitelistController::class, 'destroy'])->name('backend_core_ip_whitelist_destroy');
             });
         });
     });

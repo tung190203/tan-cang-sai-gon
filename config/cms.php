@@ -37,6 +37,11 @@ return [
                     'route' => 'backend_file_manager',
                     'title' => 'Files',
                 ],
+                'ip_whitelist' => [
+                    'icon' => 'fas fa-shield-alt',
+                    'route' => 'backend_core_ip_whitelist',
+                    'title' => 'IP Whitelist',
+                ],
             ]
         ]
     ]

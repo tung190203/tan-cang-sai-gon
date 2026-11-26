@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Rules\StrongPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -26,7 +27,7 @@ class ProfileController extends Controller
             'avatar' => 'nullable|string',
             'avatar_file' => 'nullable|file|image|mimes:jpeg,jpg,png,webp|max:2048',
             'current_password' => 'nullable|string',
-            'password' => ['nullable', 'string', 'min:8', 'regex:/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).+$/'],
+            'password' => ['nullable', 'string', new StrongPassword()],
         ];
 
         $messages = [
@@ -34,8 +35,6 @@ class ProfileController extends Controller
             'email.required' => 'Email không được để trống.',
             'email.email' => 'Email không đúng định dạng.',
             'email.unique' => 'Email đã tồn tại trên hệ thống.',
-            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
-            'password.regex' => 'Mật khẩu phải chứa ít nhất 1 chữ viết hoa và 1 ký tự đặc biệt.',
         ];
 
         $validated = $request->validate($rules, $messages);

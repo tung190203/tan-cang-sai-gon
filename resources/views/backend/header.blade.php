@@ -133,7 +133,7 @@
                     <div class="form-group">
                         <label for="profileNewPassword">Mật khẩu mới</label>
                         <input type="password" class="form-control" id="profileNewPassword" name="password" placeholder="Nhập mật khẩu mới">
-                        <small class="form-text text-muted">Mật khẩu phải lớn hơn 8 ký tự, chứa ít nhất 1 chữ hoa và 1 ký tự đặc biệt.</small>
+                        <small class="form-text text-muted">Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.</small>
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -22,4 +22,25 @@ return [
             'camera=(), microphone=(), geolocation=(), payment=(), usb=()'
         ),
     ],
+
+    'basic_auth' => [
+        'enabled' => filter_var(env('BASIC_AUTH_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
+        'username' => (string) env('BASIC_AUTH_USERNAME', ''),
+        'password' => (string) env('BASIC_AUTH_PASSWORD', ''),
+        'realm' => (string) env('BASIC_AUTH_REALM', env('APP_NAME', 'Tan Cang')),
+        'except' => [
+            'up',
+            'ttxt/webhook',
+            'webhooks/ttxt',
+        ],
+    ],
+
+    'ip_whitelist' => [
+        'enabled' => filter_var(env('IP_WHITELIST_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
+        'except' => [
+            'up',
+            'ttxt/webhook',
+            'webhooks/ttxt',
+        ],
+    ],
 ];

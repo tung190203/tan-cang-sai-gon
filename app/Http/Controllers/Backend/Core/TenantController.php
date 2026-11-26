@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Core;
 
 use App\Core\Tenant\Tenant;
 use App\Http\Controllers\Controller;
+use App\Rules\StrongPassword;
 use App\Core\Tenant\TenantProvisioner;
 use App\Models\User;
 use App\Core\Tenant\TenantDatabaseManager;
@@ -126,8 +127,7 @@ class TenantController extends Controller
                 'required_if:create_organizer,1',
                 'nullable',
                 'string',
-                'min:8',
-                'regex:/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).+$/',
+                new StrongPassword(),
             ],
         ]);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Rules\StrongPassword;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,12 +30,8 @@ class NewPasswordController extends Controller
                 'required',
                 'confirmed',
                 'string',
-                'min:8',
-                'regex:/^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).+$/',
+                new StrongPassword(),
             ],
-        ], [
-            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
-            'password.regex' => 'Mật khẩu phải chứa ít nhất 1 chữ viết hoa và 1 ký tự đặc biệt.',
         ]);
 
         $status = Password::reset(
