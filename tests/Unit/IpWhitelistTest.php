@@ -52,6 +52,8 @@ class IpWhitelistTest extends TestCase
         $resBlocked = $middleware->handle($blocked, fn () => response('ok', 200));
 
         $this->assertSame(403, $resBlocked->getStatusCode());
+        $this->assertStringContainsString('203.0.113.10', (string) $resBlocked->getContent());
+        $this->assertStringNotContainsString('(203.0.113.10)', (string) $resBlocked->getContent());
     }
 
     public function test_middleware_passes_through_when_disabled(): void
