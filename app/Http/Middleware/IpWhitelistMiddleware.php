@@ -29,22 +29,21 @@ class IpWhitelistMiddleware
         $clientIp = (string) $request->ip();
 
         if ($clientIp === '' || ! Schema::hasTable('ip_whitelists')) {
-            return $this->forbiddenResponse($clientIp);
+            return $this->forbiddenResponse();
         }
 
         $allowedIps = IpWhitelist::activeIps();
 
         if ($allowedIps === [] || ! IpUtils::checkIp($clientIp, $allowedIps)) {
-            return $this->forbiddenResponse($clientIp);
+            return $this->forbiddenResponse();
         }
 
         return $next($request);
     }
 
-    private function forbiddenResponse(string $clientIp): Response
+    private function forbiddenResponse(): Response
     {
-        $safeIp = e($clientIp);
-        $html = <<<HTML
+        $html = <<<'HTML'
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -74,24 +73,13 @@ class IpWhitelistMiddleware
         h1 {
             font-size: 20px;
             font-weight: 600;
-            margin-bottom: 10px;
             color: #dc2626;
-        }
-        p {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #4b5563;
-        }
-        .ip {
-            font-weight: 600;
-            color: #111827;
         }
     </style>
 </head>
 <body>
     <div class="box">
         <h1>Truy cập bị từ chối</h1>
-        <p>IP <span class="ip">{$safeIp}</span> không nằm trong danh sách whitelist.</p>
     </div>
 </body>
 </html>
