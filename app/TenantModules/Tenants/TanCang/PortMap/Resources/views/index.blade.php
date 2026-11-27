@@ -26,7 +26,7 @@
     @endif
 
     @php
-        $activeTab = request('tab', 'ports');
+        $activeTab = 'ports';
         $regionLabels = [
             'bac' => 'Miền Bắc',
             'trung' => 'Miền Trung',
@@ -38,13 +38,8 @@
         <div class="card-header p-0 pt-1 border-bottom-0 d-flex justify-content-between align-items-center pr-3">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link {{ $activeTab === 'ports' ? 'active' : '' }}" href="{{ route('tenant.tan_cang.port_map.index', ['tab' => 'ports']) }}">
+                    <a class="nav-link active" href="{{ route('tenant.tan_cang.port_map.index', ['tab' => 'ports']) }}">
                         <i class="fas fa-map-pin mr-1"></i> Popup &amp; Thông tin cảng
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ $activeTab === 'layers' ? 'active' : '' }}" href="{{ route('tenant.tan_cang.port_map.index', ['tab' => 'layers']) }}">
-                        <i class="fas fa-layer-group mr-1"></i> Các lớp bản đồ
                     </a>
                 </li>
             </ul>

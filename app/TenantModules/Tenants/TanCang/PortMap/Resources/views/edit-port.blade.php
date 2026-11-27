@@ -31,13 +31,23 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="name">Tên đầy đủ *</label>
+                            <label for="name">Tên đầy đủ (Tiếng Việt) *</label>
                             <input type="text" id="name" name="name" class="form-control" value="{{ old('name', $port->name) }}" required maxlength="255">
                         </div>
 
                         <div class="form-group">
-                            <label for="short_name">Tên ngắn trên bản đồ *</label>
+                            <label for="name_en">Tên đầy đủ (English - bỏ trống sẽ dùng Tiếng Việt)</label>
+                            <input type="text" id="name_en" name="name_en" class="form-control" value="{{ old('name_en', $port->name_en) }}" maxlength="255" placeholder="VD: Tan Cang - Cat Lai Terminal">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="short_name">Tên ngắn trên bản đồ (Tiếng Việt) *</label>
                             <input type="text" id="short_name" name="short_name" class="form-control" value="{{ old('short_name', $port->short_name) }}" required maxlength="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="short_name_en">Tên ngắn trên bản đồ (English - bỏ trống sẽ dùng Tiếng Việt)</label>
+                            <input type="text" id="short_name_en" name="short_name_en" class="form-control" value="{{ old('short_name_en', $port->short_name_en) }}" maxlength="100" placeholder="VD: Cat Lai">
                         </div>
 
                         <div class="form-group">
@@ -88,9 +98,9 @@
             <div class="col-lg-6">
                 <div class="card card-info">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="card-title mb-0">Các dòng thông tin trong Popup</h3>
+                        <h3 class="card-title mb-0">Các dòng thông tin trong Popup (Tiếng Việt)</h3>
                         <button type="button" id="add-popup-row" class="btn btn-xs btn-light text-dark">
-                            <i class="fas fa-plus"></i> Thêm dòng
+                            <i class="fas fa-plus"></i> Thêm dòng (VI)
                         </button>
                     </div>
                     <div class="card-body">
@@ -129,6 +139,50 @@
                         <small class="text-muted">Các dòng này sẽ hiển thị trực tiếp trong thẻ popup khi người dùng chọn cảng trên bản đồ Frontend.</small>
                     </div>
                 </div>
+
+                <div class="card card-secondary">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">Các dòng thông tin trong Popup (English - tùy chọn)</h3>
+                        <button type="button" id="add-popup-row-en" class="btn btn-xs btn-light text-dark">
+                            <i class="fas fa-plus"></i> Thêm dòng (EN)
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="popup-rows-en-container">
+                            @php
+                                $rowsEn = old('popup_keys_en')
+                                    ? collect(old('popup_keys_en'))->map(fn ($k, $i) => ['k' => $k, 'v' => old('popup_values_en.' . $i, '')])->all()
+                                    : ($port->popup_rows_en ?? []);
+                            @endphp
+                            @forelse ($rowsEn as $row)
+                                <div class="form-row align-items-center mb-2 popup-row-item">
+                                    <div class="col-4">
+                                        <input type="text" name="popup_keys_en[]" class="form-control form-control-sm" value="{{ $row['k'] ?? '' }}" placeholder="Label (e.g. Location)" maxlength="100">
+                                    </div>
+                                    <div class="col-7">
+                                        <input type="text" name="popup_values_en[]" class="form-control form-control-sm" value="{{ $row['v'] ?? '' }}" placeholder="Value" maxlength="500">
+                                    </div>
+                                    <div class="col-1 text-right">
+                                        <button type="button" class="btn btn-xs btn-danger remove-popup-row" title="Xóa dòng">&times;</button>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="form-row align-items-center mb-2 popup-row-item">
+                                    <div class="col-4">
+                                        <input type="text" name="popup_keys_en[]" class="form-control form-control-sm" placeholder="Label (e.g. Location)" maxlength="100">
+                                    </div>
+                                    <div class="col-7">
+                                        <input type="text" name="popup_values_en[]" class="form-control form-control-sm" placeholder="Value" maxlength="500">
+                                    </div>
+                                    <div class="col-1 text-right">
+                                        <button type="button" class="btn btn-xs btn-danger remove-popup-row" title="Xóa dòng">&times;</button>
+                                    </div>
+                                </div>
+                            @endforelse
+                        </div>
+                        <small class="text-muted">Nếu để trống toàn bộ phần Tiếng Anh, hệ thống tự động hiển thị nội dung Tiếng Việt khi người dùng chuyển sang EN.</small>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -148,26 +202,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('popup-rows-container');
     const addButton = document.getElementById('add-popup-row');
 
-    if (addButton && container) {
-        addButton.addEventListener('click', function () {
-            const row = document.createElement('div');
-            row.className = 'form-row align-items-center mb-2 popup-row-item';
-            row.innerHTML =
-                '<div class="col-4"><input type="text" name="popup_keys[]" class="form-control form-control-sm" placeholder="Nhãn (VD: Diện tích)" maxlength="100"></div>' +
-                '<div class="col-7"><input type="text" name="popup_values[]" class="form-control form-control-sm" placeholder="Giá trị thông tin" maxlength="500"></div>' +
-                '<div class="col-1 text-right"><button type="button" class="btn btn-xs btn-danger remove-popup-row" title="Xóa dòng">&times;</button></div>';
-            container.appendChild(row);
-        });
+    const containerEn = document.getElementById('popup-rows-en-container');
+    const addButtonEn = document.getElementById('add-popup-row-en');
 
-        container.addEventListener('click', function (event) {
-            if (event.target.classList.contains('remove-popup-row')) {
-                const row = event.target.closest('.popup-row-item');
-                if (row) {
-                    row.remove();
+    const bindRowEvents = (wrap, addBtn, keyName, valName, keyPh, valPh) => {
+        if (addBtn && wrap) {
+            addBtn.addEventListener('click', function () {
+                const row = document.createElement('div');
+                row.className = 'form-row align-items-center mb-2 popup-row-item';
+                row.innerHTML =
+                    '<div class="col-4"><input type="text" name="' + keyName + '[]" class="form-control form-control-sm" placeholder="' + keyPh + '" maxlength="100"></div>' +
+                    '<div class="col-7"><input type="text" name="' + valName + '[]" class="form-control form-control-sm" placeholder="' + valPh + '" maxlength="500"></div>' +
+                    '<div class="col-1 text-right"><button type="button" class="btn btn-xs btn-danger remove-popup-row" title="Xóa dòng">&times;</button></div>';
+                wrap.appendChild(row);
+            });
+        }
+        if (wrap) {
+            wrap.addEventListener('click', function (event) {
+                if (event.target.classList.contains('remove-popup-row')) {
+                    const row = event.target.closest('.popup-row-item');
+                    if (row) {
+                        row.remove();
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
+    };
+
+    bindRowEvents(container, addButton, 'popup_keys', 'popup_values', 'Nhãn (VD: Diện tích)', 'Giá trị thông tin');
+    bindRowEvents(containerEn, addButtonEn, 'popup_keys_en', 'popup_values_en', 'Label (e.g. Area)', 'Value');
 });
 </script>
 @endpush

@@ -54,7 +54,9 @@ class PortMapController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['nullable', 'string', 'max:255'],
             'short_name' => ['required', 'string', 'max:100'],
+            'short_name_en' => ['nullable', 'string', 'max:100'],
             'region' => ['required', Rule::in(['bac', 'trung', 'nam'])],
             'has_tour' => ['nullable', 'boolean'],
             'tour_url' => [
@@ -70,23 +72,16 @@ class PortMapController extends Controller
             'popup_keys.*' => ['nullable', 'string', 'max:100'],
             'popup_values' => ['nullable', 'array', 'max:20'],
             'popup_values.*' => ['nullable', 'string', 'max:500'],
+            'popup_keys_en' => ['nullable', 'array', 'max:20'],
+            'popup_keys_en.*' => ['nullable', 'string', 'max:100'],
+            'popup_values_en' => ['nullable', 'array', 'max:20'],
+            'popup_values_en.*' => ['nullable', 'string', 'max:500'],
         ], [
             'tour_url.regex' => 'Link VR Tour chỉ chấp nhận đường dẫn http://, https:// hoặc đường dẫn nội bộ bắt đầu bằng /.',
         ]);
 
-        $popupRows = [];
-        $keys = $validated['popup_keys'] ?? [];
-        $values = $validated['popup_values'] ?? [];
-        foreach ($keys as $index => $key) {
-            $cleanKey = trim((string) $key);
-            $cleanVal = trim((string) ($values[$index] ?? ''));
-            if ($cleanKey !== '' || $cleanVal !== '') {
-                $popupRows[] = [
-                    'k' => $cleanKey,
-                    'v' => $cleanVal,
-                ];
-            }
-        }
+        $popupRows = $this->extractPopupRows($validated['popup_keys'] ?? [], $validated['popup_values'] ?? []);
+        $popupRowsEn = $this->extractPopupRows($validated['popup_keys_en'] ?? [], $validated['popup_values_en'] ?? []);
 
         if ($request->boolean('remove_image') && $port->image_path) {
             if (Storage::disk('public')->exists($port->image_path)) {
@@ -111,19 +106,42 @@ class PortMapController extends Controller
             $port->image_path = $fileName;
         }
 
+        $nameEn = trim(strip_tags((string) ($validated['name_en'] ?? '')));
+        $shortNameEn = trim(strip_tags((string) ($validated['short_name_en'] ?? '')));
+
         $port->fill([
             'name' => trim(strip_tags($validated['name'])),
+            'name_en' => $nameEn !== '' ? $nameEn : null,
             'short_name' => trim(strip_tags($validated['short_name'])),
+            'short_name_en' => $shortNameEn !== '' ? $shortNameEn : null,
             'region' => $validated['region'],
             'has_tour' => $request->boolean('has_tour'),
             'tour_url' => $validated['tour_url'] ?? null,
             'is_active' => $request->boolean('is_active'),
             'popup_rows' => $popupRows,
+            'popup_rows_en' => $popupRowsEn,
         ])->save();
 
         return redirect()
             ->route('tenant.tan_cang.port_map.index')
             ->with('success', 'Đã cập nhật thông tin popup cảng: ' . $port->short_name);
+    }
+
+    private function extractPopupRows(array $keys, array $values): array
+    {
+        $rows = [];
+        foreach ($keys as $index => $key) {
+            $cleanKey = trim(strip_tags((string) $key));
+            $cleanVal = trim(strip_tags((string) ($values[$index] ?? '')));
+            if ($cleanKey !== '' || $cleanVal !== '') {
+                $rows[] = [
+                    'k' => $cleanKey,
+                    'v' => $cleanVal,
+                ];
+            }
+        }
+
+        return $rows;
     }
 
     public function togglePort(Request $request, PortLocation $port)

@@ -56,13 +56,16 @@ class PortMapConfigService
                     return [
                         $port->code => [
                             'name' => $port->name,
+                            'nameEn' => $port->name_en,
                             'short' => $port->short_name,
+                            'shortEn' => $port->short_name_en,
                             'region' => $port->region,
                             'isHq' => $port->is_hq,
                             'hasTour' => $port->has_tour,
                             'tourUrl' => $port->tour_url,
                             'img' => $port->image_path ? asset('storage/' . ltrim($port->image_path, '/')) : null,
                             'rows' => is_array($port->popup_rows) ? array_values($port->popup_rows) : [],
+                            'rowsEn' => is_array($port->popup_rows_en) ? array_values($port->popup_rows_en) : [],
                             'active' => $port->is_active,
                         ],
                     ];
